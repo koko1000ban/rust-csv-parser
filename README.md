@@ -2,8 +2,8 @@ CSV parser based on RFC 4180.
 
 Example1
 ---------
- 	csv::open(\"/path/to/csv_file\") { |fields|
-   		#log("%s",fields[0]);
+ 	csv::open("/path/to/csv_file") { |fields|
+   		#info("%s",fields[0]);
 	}
 	
 Example2
