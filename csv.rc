@@ -1,4 +1,6 @@
-#[link(name = "csv", vers = "0.1", uuid = "C3B5C6A9-FA88-49BD-9BAB-FD6503700163", author = "tabito")];
+#[link(name = "csv", vers = "0.2", uuid = "C3B5C6A9-FA88-49BD-9BAB-FD6503700163", author = "tabito")];
 #[crate_type = "lib"];
+
+use std;
 
 mod csv;

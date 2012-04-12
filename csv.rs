@@ -1,16 +1,14 @@
 //parse follow RFC 4180
 
-use std;
-
 export parse_line, parse, open;
 
 #[doc = "Split lines"]
 fn split_csv(data: str) -> [str] {
-  let splited = [];
+  let mut splited = [];
 
   //lines_anyを使うことで複数の改行コードをサポート
-  let lines = str::lines_any(data);
-  let linenum=0;
+  let mut lines = str::lines_any(data);
+  let mut linenum = 0;
   
   //#はじまりと空行はskip (log warn)
   // 正規表現ほしいなあ
@@ -20,13 +18,14 @@ fn split_csv(data: str) -> [str] {
       log(warn, #fmt("ignore line:%d. it may be empty or comment line.", linenum+1));
     }
     linenum+=1;
-    ret !f;
+    !f
   };
-
-  let i=0, n=vec::len(lines) as int;
+  
+  let mut i=0, n=vec::len(lines) as int;
   while i < n {
-    let line = lines[i];
-    let quote_count = vec::count(str::chars(lines[i]), '"') as int;
+    let mut line = lines[i];
+    let mut quote_count = vec::count(str::chars(lines[i]), '"') as int;
+    
     //splitした行のダブルクォーテーションが奇数であれば偶数になるまで次行と結合
     while quote_count % 2 != 0 {
       if i+1 >= n {
@@ -47,12 +46,13 @@ fn split_csv(data: str) -> [str] {
 
 #[doc = "Parse line to csv row"]
 fn parse_line(line: str) -> [str] {
-  let row = [];
-  let i=0u, n=str::len(line);
-  let quoted = false;
-  let elem="";
+  let mut row = [];
+  let mut i=0u, n=str::len(line);
+  let mut elem="";
+  let mut quoted = false;
+
   while i < n {
-    let {ch, next} = str::char_range_at(line, i);
+    let mut {ch, next} = str::char_range_at(line, i);
     log(debug, #fmt("%c | %b", ch, quoted));
 
     alt ch {
@@ -144,7 +144,7 @@ csv::parse(\"a,b,c\") { |row|
 "]
 fn parse(data:str, receiver: fn([str])) {
   let splited = split_csv(data);
-  for line in splited {
+  for splited.each {|line|
     receiver(parse_line(line));
   }
 }
@@ -155,7 +155,7 @@ mod test{
   fn rowmatch(testdata: str, expected: [[str]]) {
     let runchecks = fn@(testdata: str) {
       let splited = split_csv(testdata);
-      let i = 0u;
+      let mut i = 0u;
       let n = vec::len(splited);
       if n != vec::len(expected) {
         log(info, (splited, expected));
@@ -167,7 +167,7 @@ mod test{
         let expect = expected[i];
         assert(row.len() == vec::len(expect));
         
-        let j = 0u;
+        let mut j = 0u;
         while j < row.len() {
           assert(row[j] == expect[j]);
           j += 1u;
@@ -183,26 +183,13 @@ mod test{
     runchecks(testdata+"\n");
     runchecks(str::replace(testdata, "\n", "\r\n"));
   }
-
-  #[test]
-  fn test_open(){
-    let rows = [];
-    open("test/test1.csv") { |row|
-      let cells = [];
-      for cell in row {
-        cells += [cell];
-      }
-      rows += [cells];
-    };
-    assert(rows == [["9404","あやめ公園","0","ｱﾔﾒｺｳｴﾝ"],["4778","一本松(埼玉県)","0","ｲｯﾎﾟﾝﾏﾂ"], ["9482","羽田空港第１ビル","0","ﾊﾈﾀﾞｸｳｺｳﾀﾞｲｲﾁﾋﾞﾙ"]]);
-  }
   
   #[test]
   fn test_parse(){
-    let rows = [];
+    let mut rows = [];
     parse("9404,あやめ公園,0,ｱﾔﾒｺｳｴﾝ\n4778,一本松(埼玉県),0,ｲｯﾎﾟﾝﾏﾂ\n9482,羽田空港第１ビル,0,ﾊﾈﾀﾞｸｳｺｳﾀﾞｲｲﾁﾋﾞﾙ") { |row|
-      let cells = [];
-      for cell in row {
+      let mut cells = [];
+      for row.each {|cell|
         cells += [cell];
       }
       rows += [cells];
